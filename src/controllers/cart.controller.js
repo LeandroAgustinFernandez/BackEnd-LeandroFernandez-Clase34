@@ -7,61 +7,76 @@ import {
 export const getCart = async (request, response) => {
   const { cid } = request?.user?.cart || request?.params;
   let res = await CART_SERVICES.getCart(cid);
-  res?.error
-    ? response.status(404).send({ res })
-    : response.send({ status: `success`, payload: res });
+  if (res?.error) {
+    response.status(404).send({ res });
+  } else {
+    response.send({ status: `success`, payload: res });
+  }
 };
 
 export const createCart = async (request, response) => {
   let res = await CART_SERVICES.createCart();
-  res?.error
-    ? response.status(404).send({ status: res.error })
-    : response.send({
-        status: `The cart was created succesfully.`,
-        payload: res,
-      });
+  if (res?.error) {
+    request.logger.error(`ERROR => ${new Date()} - ${ res.error }`);
+    response.status(404).send({ status: res.error });
+  } else {
+    response.send({
+      status: `The cart was created succesfully.`,
+      payload: res,
+    });
+  }
 };
 
 export const deleteCart = async (request, response) => {
   const { cid } = request.params;
   let res = await CART_SERVICES.deleteCart(cid);
-  res?.error
-    ? response.status(400).send({ ...res })
-    : response.send({ ...res });
+  if (res?.error) {
+    response.status(400).send({ ...res })
+  } else {
+    response.send({ ...res });
+  }
 };
 
 export const updateCart = async (request, response) => {
   const { cid } = request.params;
   const { products } = request.body;
   let res = await CART_SERVICES.updateCart(cid, products);
-  res?.error
-    ? response.status(400).send({ ...res })
-    : response.send({ ...res });
+  if (res?.error) {
+    response.status(400).send({ ...res })
+  } else {
+    response.send({ ...res });
+  }
 };
 
 export const updateProductInCart = async (request, response) => {
   const { cid, pid } = request.params;
   const { quantity } = request.body;
   let res = await CART_SERVICES.updateProductInCart(cid, pid, quantity);
-  res?.error
-    ? response.status(400).send({ ...res })
-    : response.send({ ...res });
+  if (res?.error) {
+    response.status(400).send({ ...res })
+  } else {
+    response.send({ ...res });
+  }
 };
 
 export const addProductInCart = async (request, response) => {
   const { cid, pid } = request.params;
   let res = await CART_SERVICES.addProductInCart(cid, pid);
-  res?.error
-    ? response.status(400).send({ ...res })
-    : response.send({ ...res });
+  if (res?.error) {
+    response.status(400).send({ ...res })
+  } else {
+    response.send({ ...res });
+  }
 };
 
 export const deleteProductInCart = async (request, response) => {
   const { cid, pid } = request.params;
   let res = await CART_SERVICES.deleteProductInCart(cid, pid);
-  res?.error
-    ? response.status(400).send({ ...res })
-    : response.send({ ...res });
+  if (res?.error) {
+    response.status(400).send({ ...res })
+  } else {
+    response.send({ ...res });
+  }
 };
 
 export const closeCart = async (request, response) => {
@@ -85,6 +100,7 @@ export const closeCart = async (request, response) => {
     });
 
     if (amount > 0) {
+      request.logger.info(`INFO => ${new Date()} - New purchase: ${ amount, purchaser }`);
       let res = await TICKET_SERVICES.createTicket({ amount, purchaser });
       if (res?.error) {
         return response.status(400).send({ ...res });

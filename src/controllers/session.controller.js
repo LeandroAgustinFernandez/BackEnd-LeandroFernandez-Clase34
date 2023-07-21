@@ -12,6 +12,7 @@ export const login = async (request, response) => {
   return response.status(401).send({ error: `User not found` });
   if (!isValidPassword(user, password))
   return response.status(401).send({ error: `User or Password are wrong` });
+  request.logger.info(`INFO => ${new Date()} - ${ user.email } had log`);
   delete user.password;
   const token = generateToken(user);
   response

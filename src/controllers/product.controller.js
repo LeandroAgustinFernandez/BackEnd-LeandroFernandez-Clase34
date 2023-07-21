@@ -1,6 +1,6 @@
-import CustomError from "../middleware/errors/CustomError.js";
-import { generateProductErrorAttributes } from "../middleware/errors/info.js";
-import EErrors from '../middleware/errors/enum.js'
+// import CustomError from "../middleware/errors/CustomError.js";
+// import { generateProductErrorAttributes } from "../middleware/errors/info.js";
+// import EErrors from '../middleware/errors/enum.js'
 import { PRODUCT_SERVICES } from "../services/servicesManager.js";
 import { generateProduct } from "../utils.js";
 
@@ -31,41 +31,41 @@ export const getProduct = async (request, response) => {
     : response.send({ status: `success`, product: res });
 };
 
-// export const saveProduct = async (request, response) => {
-//   const io = request.app.get("socketio");
-//   const { files, body } = request;
-//   let product = { ...body, status: true };
-//   let thumbnails = files.map((file) => file.originalname);
-//   product.thumbnails = thumbnails || [];
-//   let res = await PRODUCT_SERVICES.saveProduct(product);
-//   let res2 = await PRODUCT_SERVICES.getProducts();
-//   response.send(res);
-//   io.emit("products", res2);
-// };
-
 export const saveProduct = async (request, response) => {
-  const { body } = request;
+  const io = request.app.get("socketio");
+  const { files, body } = request;
   let product = { ...body, status: true };
-  if (
-    !product.title ||
-    !product.description ||
-    !product.price ||
-    !product.code ||
-    !product.status ||
-    !product.stock ||
-    !product.category
-  ) {
-    throw CustomError.createError({
-      name: "TYPE_ERROR",
-      cause: generateProductErrorAttributes(body),
-      message: "Error trying to create the product.",
-      code: EErrors.INVALID_TYPE_ERROR
-    });
-  }
-    product.thumbnails = [];
-    let res = await PRODUCT_SERVICES.saveProduct(product);
-    response.send(res);
+  let thumbnails = files.map((file) => file.originalname);
+  product.thumbnails = thumbnails || [];
+  let res = await PRODUCT_SERVICES.saveProduct(product);
+  let res2 = await PRODUCT_SERVICES.getProducts();
+  response.send(res);
+  io.emit("products", res2);
 };
+
+// export const saveProduct = async (request, response) => {
+//   const { body } = request;
+//   let product = { ...body, status: true };
+//   if (
+//     !product.title ||
+//     !product.description ||
+//     !product.price ||
+//     !product.code ||
+//     !product.status ||
+//     !product.stock ||
+//     !product.category
+//   ) {
+//     throw CustomError.createError({
+//       name: "TYPE_ERROR",
+//       cause: generateProductErrorAttributes(body),
+//       message: "Error trying to create the product.",
+//       code: EErrors.INVALID_TYPE_ERROR
+//     });
+//   }
+//     product.thumbnails = [];
+//     let res = await PRODUCT_SERVICES.saveProduct(product);
+//     response.send(res);
+// };
 
 export const deleteProduct = async (request, response) => {
   let { pid } = request.params;
@@ -89,6 +89,5 @@ export const getMocksProducts = async (request, response) => {
   for (let i = 0; i < 100; i++) {
     products.push(generateProduct());
   }
-
   response.send(products);
 };
