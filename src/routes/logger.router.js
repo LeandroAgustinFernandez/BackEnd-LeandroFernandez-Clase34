@@ -3,7 +3,7 @@ import { getLogs } from '../controllers/logger.controller.js'
 
 class LoggerRouterClass extends RouterClass {
   init() {
-    this.get("/", getLogs);
+    this.get("/loggerTest", getLogs);
   }
 }
 
